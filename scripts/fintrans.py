@@ -77,13 +77,15 @@ class FinTransSource(object):
   # creates a single financial transaction (ATM withdrawal) using the following
   # format:
   # {
-  #   'timestamp': '2013-11-08T10:58:19.668225',
-  #   'atm' : 'Santander', 
-  #   'lat': '39.5655472',
-  #   'lon': '-0.530058',
-  #   'amount': 100, 
-  #   'account_id': 'a335', 
-  #   'transaction_id': '636adacc-49d2-11e3-a3d1-a820664821e3'
+  #     "account_id": "a228",
+  #     "timestamp": "2018-10-05T10:47:54.189407",
+  #     "atm": "Bank of the West",
+  #     "amount": 300,
+  #     "location": {
+  #         "lat": "37.2500148",
+  #         "lon": "-121.8621345"
+  #     },
+  #     "transaction_id": "bb35284a-c883-11e8-8421-186590d22a35"
   # }
   def _create_fintran(self):
     rloc = random.choice(self.atm_loc.keys()) # obtain a random ATM location
@@ -91,8 +93,10 @@ class FinTransSource(object):
     fintran = {
       'timestamp' : str(datetime.datetime.now().isoformat()),
       'atm' : str(atm_label),
-      'lat' : str(lat),
-      'lon' :  str(lon),
+      'location' : {
+        'lat' : str(lat),
+        'lon' :  str(lon)
+      },
       'amount' : random.choice(AMOUNTS),
       'account_id' : 'a' + str(random.randint(1, 1000)),
       'transaction_id' : str(uuid.uuid1())
@@ -103,13 +107,15 @@ class FinTransSource(object):
   # creates a single fraudulent financial transaction (ATM withdrawal)
   # based on an existing transaction, using the following format:
   # {
-  #   'timestamp': '2013-11-08T12:28:39.466325', 
-  #   'atm' : 'Santander', 
-  #   'lat': '39.5655472',
-  #   'lon': '-0.530058',
-  #   'amount': 200, 
-  #   'account_id': 'a335', 
-  #   'transaction_id': 'xxx636adacc-49d2-11e3-a3d1-a820664821e3'
+  #   "account_id": "a314",
+  #   "timestamp": "2018-10-05T10:48:07.722905",
+  #   "atm": "Bank of America",
+  #   "amount": 50,
+  #   "location": {
+  #       "lat": "37.2715281",
+  #       "lon": "-121.9067962"
+  #   },
+  #   "transaction_id": "xxxc34630ba-c883-11e8-8dc3-186590d22a35"
   # }
   # Note: the fraudulent transaction will have the same account ID as
   #       the original transaction but different location and ammount.
@@ -119,8 +125,10 @@ class FinTransSource(object):
     fraudtran = {
       'timestamp' : str(datetime.datetime.now().isoformat()),
       'atm' : str(atm_label),
-      'lat' : str(lat),
-      'lon' :  str(lon),
+      'location' : {
+        'lat' : str(lat),
+        'lon' :  str(lon)
+      },
       'amount' : random.choice(AMOUNTS),
       'account_id' : fintran['account_id'],
       'transaction_id' : 'xxx' + str(fintran['transaction_id'])
