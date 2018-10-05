@@ -28,14 +28,17 @@ GESS_IP = "127.0.0.1"
 # defines default port for a single gess running
 GESS_UDP_PORT = 6900
 
+# defines delay (seconds) to inject between events
+DELAY = 0.5
+
 # defines the sampling interval (in seconds) for reporting runtime statistics
 SAMPLE_INTERVAL = 10
 
 # lower range for randomly emitted frauds (min. tick between trans)
-FRAUD_TICK_MIN = 2000
+FRAUD_TICK_MIN = 2
 
 # upper range for randomly emitted frauds (max. tick between trans)
-FRAUD_TICK_MAX = 20000
+FRAUD_TICK_MAX = 20
 
 # ATM withdrawal data config
 AMOUNTS = [20, 50, 100, 200, 300, 400]
@@ -176,6 +179,8 @@ class FinTransSource(object):
 
       (fintran, fintransize) = self._create_fintran()
       self._send_fintran(out_socket, json.dumps(fintran))
+
+      sleep(DELAY)
 
       # here a fraudulent transaction will be ingested, randomly every 10-100sec
       if ticks > fraud_tick:
