@@ -47,12 +47,15 @@ and logs them in a file with the name `dummy_gess_sink.log`.
 
 ## Data
 
-### Default setting (Spanish ATM locations  )
+### Default setting 
 
-We aim for quality synthetic data. To this end, the default data used for the
-ATM locations is that of Spain obtained from the [OpenStreetMap](http://openstreetmap.org) project.
-To be more precise, the default data are the [geo-coordinates](data/osm-atm-garmin.csv) 
-of 822 ATMs in Spain which have been downloaded via the [POI export](http://poi-osm.tucristal.es/) service.
+Three default datasets for ATMs are included: 
+
+- 822 ATMs in Spain which have been downloaded via the (since-defunct) http://poi-osm.tucristal.es/ service.
+- 415 ATMs in the SF Bay area
+- 336 ATMs in the West Yorkshire (UK) area
+
+Data comes from the [OpenStreetMap](http://openstreetmap.org) project.
 
 The withdrawal amounts are stacked (20, 50, 100, 200, 300, 400) and the rest
 of the data (transaction ID/timestamp) is arbitrary. 
@@ -67,16 +70,20 @@ CLI-level debugging but can otherwise be ignored.
 
 If you want to add new ATM locations, then you need to do the following:
 
-1. Choose a geographic area and download the respective `.osm` dump from sites such as [Metro Extracts](http://metro.teczno.com/).
+1. Choose a geographic area and download the respective `.osm` dump from sites such as 
+    * https://export.hotosm.org/en/v3/
+        * (e.g. https://export.hotosm.org/en/v3/exports/7e60635f-18b4-4650-9146-68c72a3a6c65)
+        * From HOTOSM you can opt to download _just_ ATM points, which makes the file smaller
+    * https://archive.org/download/metro.teczno.com
+    * https://osmaxx.hsr.ch/
 1. Then, run `data/extract_atms.py`, which uses the ATM-tagged nodes in [OSM/XML](http://wiki.openstreetmap.org/wiki/OSM_XML) format and extracts/converts it into the [CSV format](data/osm-atm-garmin.csv) used internally, by gess.
-1. Add the so generated ATM location data file in CSV format to `gess.conf` so that gess picks it up on startup time.
-
+1. You can also download KML format data and use the `extract_atms_kml.py` script (`pykml` was an easier library to install than the `imposm` library required for OSM)
+1. Add the generated ATM location data file in CSV format to `gess.conf` so that gess picks it up on startup time.
 
 To give you an idea in terms of performance: on my laptop (a MBP with 16 GB RAM)
 it takes approximately 3 min to extract 416 ATM locations from the 
 [San Francisco Bay Area](http://osm-extracted-metros.s3.amazonaws.com/sf-bay-area.osm.bz2)
 OSM file. This OSM file contains some 198,000 nodes with a raw, unzipped file size of 1.45 GB.  
-
 ## Understanding the runtime statistics
 
 In parallel to the data streaming, `gess` will output runtime statistics every
