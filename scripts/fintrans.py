@@ -29,16 +29,16 @@ GESS_IP = "127.0.0.1"
 GESS_UDP_PORT = 6900
 
 # defines delay (seconds) to inject between events
-DELAY = 0.5
+DELAY = 1
 
 # defines the sampling interval (in seconds) for reporting runtime statistics
 SAMPLE_INTERVAL = 10
 
 # lower range for randomly emitted frauds (min. tick between trans)
-FRAUD_TICK_MIN = 2
+FRAUD_TICK_MIN = 5
 
 # upper range for randomly emitted frauds (max. tick between trans)
-FRAUD_TICK_MAX = 20
+FRAUD_TICK_MAX = 15
 
 # ATM withdrawal data config
 AMOUNTS = [20, 50, 100, 200, 300, 400]
@@ -90,11 +90,13 @@ class FinTransSource(object):
   #     },
   #     "transaction_id": "bb35284a-c883-11e8-8421-186590d22a35"
   # }
+  #
+  # NB timezone is hardcoded to UTC. Sorry. 
   def _create_fintran(self):
     rloc = random.choice(self.atm_loc.keys()) # obtain a random ATM location
     lat, lon, atm_label = self.atm_loc[rloc]
     fintran = {
-      'timestamp' : str(datetime.datetime.now().isoformat()),
+      'timestamp' : str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %z+0000")),
       'atm' : str(atm_label),
       'location' : {
         'lat' : str(lat),
@@ -121,12 +123,16 @@ class FinTransSource(object):
   #   "transaction_id": "xxxc34630ba-c883-11e8-8dc3-186590d22a35"
   # }
   # Note: the fraudulent transaction will have the same account ID as
-  #       the original transaction but different location and ammount.
+  #       the original transaction but different location and amount.
+  # The timestamp will be randomly different, in a range between one minute and ten minutes earlier than the 'real' txn.
+  #
+  # NB timezone is hardcoded to UTC. Sorry. 
+
   def _create_fraudtran(self, fintran):
     rloc = random.choice(self.atm_loc.keys()) # obtain a random ATM location
     lat, lon, atm_label = self.atm_loc[rloc]
     fraudtran = {
-      'timestamp' : str(datetime.datetime.now().isoformat()),
+      'timestamp' : str((datetime.datetime.now() - datetime.timedelta(seconds=random.randint(60,600))).strftime("%Y-%m-%d %H:%M:%S %z+0000")),
       'atm' : str(atm_label),
       'location' : {
         'lat' : str(lat),
