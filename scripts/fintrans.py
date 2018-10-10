@@ -29,7 +29,7 @@ GESS_IP = "127.0.0.1"
 GESS_UDP_PORT = 6900
 
 # defines delay (seconds) to inject between events
-DELAY = 1
+DELAY = 0.75
 
 # defines the sampling interval (in seconds) for reporting runtime statistics
 SAMPLE_INTERVAL = 10
@@ -63,7 +63,7 @@ class FinTransSource(object):
   
   # loads the ATM location data from the specified CSV data file
   def _load_data(self, atm_loc_data_file):
-    logging.debug('Trying to parse ATM location data file %s' %(atm_loc_data_file))
+    logging.info('Trying to parse ATM location data file %s' %(atm_loc_data_file))
     osm_atm_file = open(atm_loc_data_file, 'rb')
     atm_counter = 0
     try:
@@ -176,7 +176,9 @@ class FinTransSource(object):
     #  tp_fintrans ... throughput of financial transactions (in thousands/sec)
     #  num_bytes ... number of bytes emitted (in MB)
     #  tp_bytes ... throughput of bytes (in MB/sec)
-    logging.info('timestamp\tnum_fintrans\ttp_fintrans\tnum_bytes\ttp_bytes')
+    logging.info('gess is now running!')
+    logging.info('\nEvents are emitted on UDP to port 6900\nConsume them with a tool such as netcat, e.g.\n\tnc -v -u -l 6900\n\n')
+    logging.info('timestamp\t\ttxn\ttxn/s')
     
     while True:
       
@@ -204,15 +206,13 @@ class FinTransSource(object):
       diff_time = end_time - start_time
     
       if diff_time.seconds > (SAMPLE_INTERVAL - 1):
-        tp_fintrans = (num_fintrans/1000) / diff_time.seconds
+        tp_fintrans = (num_fintrans) / diff_time.seconds
         tp_bytes = (num_bytes/1024/1024) / diff_time.seconds
-        logging.info('%s\t%d\t%d\t%d\t%d'
+        logging.info('%s\t%d\t%d'
           %(
             str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
-            (num_fintrans/1000), 
-            tp_fintrans,
-            (num_bytes/1024/1024),
-            tp_bytes
+            (num_fintrans), 
+            tp_fintrans
           )
         )
         start_time = datetime.datetime.now()
