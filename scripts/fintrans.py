@@ -22,14 +22,20 @@ from time import sleep
 
 DEBUG = False
 
-# defines the host for a single gess running
-GESS_IP = "127.0.0.1"
+TARGET_HOST = os.environ.get('TARGET_HOST')
+if TARGET_HOST is None: 
+  TARGET_HOST = "localhost"
 
-# defines default port for a single gess running
-GESS_UDP_PORT = 6900
+GESS_UDP_PORT = os.environ.get('TARGET_UDP_PORT')
+if GESS_UDP_PORT is None: 
+  GESS_UDP_PORT = 6900
 
 # defines delay (seconds) to inject between events
-DELAY = 0.75
+DELAY = os.environ.get('EVENT_DELAY')
+if DELAY is None: 
+  DELAY = 0.75
+else:
+  DELAY=float(DELAY)
 
 # defines the sampling interval (in seconds) for reporting runtime statistics
 SAMPLE_INTERVAL = 10
@@ -147,7 +153,7 @@ class FinTransSource(object):
 
   # sends a single financial transaction via UDP
   def _send_fintran(self, out_socket, fintran):
-    out_socket.sendto(str(fintran) + '\n', (GESS_IP, self.send_port))
+    out_socket.sendto(str(fintran) + '\n', (TARGET_HOST, self.send_port))
     logging.debug('Sent financial transaction: %s' %fintran)
     
   ############# API ############################################################
@@ -177,7 +183,7 @@ class FinTransSource(object):
     #  num_bytes ... number of bytes emitted (in MB)
     #  tp_bytes ... throughput of bytes (in MB/sec)
     logging.info('gess is now running!')
-    logging.info('\nEvents are emitted on UDP to port 6900\nConsume them with a tool such as netcat, e.g.\n\tnc -v -u -l 6900\n\n')
+    logging.info('\nEvents are emitted with a delay of %s \non UDP to %s on port %s\nConsume them with a tool such as netcat, e.g.\n\tnc -v -u -l %s\n\n' % (DELAY,TARGET_HOST,GESS_UDP_PORT,GESS_UDP_PORT))
     logging.info('timestamp\t\ttxn\ttxn/s')
     
     while True:
